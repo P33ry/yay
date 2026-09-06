@@ -23,6 +23,7 @@ import (
 	"github.com/Jguer/aur/rpc"
 	"github.com/Jguer/votar/pkg/vote"
 	"github.com/Morganamilo/go-pacmanconf"
+	"github.com/zalando/go-keyring"
 
 	"golang.org/x/net/proxy"
 )
@@ -76,9 +77,24 @@ func NewRuntime(cfg *settings.Configuration, cmdArgs *parser.Arguments, version 
 		return nil, errVote
 	}
 
+	aurUsername := os.Getenv("AUR_USERNAME")
+	aurPassword := os.Getenv("AUR_PASSWORD")
+	if os.Getenv("AUR_USERNAME") == "" {
+		secret, err := keyring.Get("yay", "user")
+		if err == nil {
+			aurUsername = secret
+		}
+	}
+	if os.Getenv("AUR_PASSWORD") == "" {
+		secret, err := keyring.Get("yay", "password")
+		if err == nil {
+			aurPassword = secret
+		}
+	}
+
 	voteClient.SetCredentials(
-		os.Getenv("AUR_USERNAME"),
-		os.Getenv("AUR_PASSWORD"))
+		aurUsername,
+		aurPassword)
 
 	userAgentFn := func(ctx context.Context, req *http.Request) error {
 		req.Header.Set("User-Agent", userAgent)
