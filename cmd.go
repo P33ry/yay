@@ -393,6 +393,8 @@ func handleWeb(ctx context.Context, run *runtime.Runtime, cmdArgs *parser.Argume
 	case cmdArgs.ExistsArg("u", "unvote"):
 		return handlePackageVote(ctx, cmdArgs.Targets, run.AURClient, run.Logger,
 			run.VoteClient, false)
+	case cmdArgs.ExistsArg("k", "keyring"):
+		return handleKeyring(run.Logger)
 	}
 
 	return nil
